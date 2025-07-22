@@ -75,7 +75,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('userId');
 
-    // 送信ボタン押下時
     document.getElementById("submitBtn").addEventListener("click", async () => {
       const messageText = document.getElementById("message").value.trim();
       const status = document.getElementById("statusMessage");
@@ -91,20 +90,21 @@
       }
 
       try {
-        const res = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: userId,
-            message: messageText,
-            type: "問い合わせ"
-          })
+        // GETパラメータにエンコードして送信
+        const query = new URLSearchParams({
+          userId: userId,
+          inquiry: messageText
+        });
+
+        const res = await fetch(`${webhookUrl}?${query.toString()}`, {
+          method: "GET"
         });
 
         if (!res.ok) throw new Error("送信に失敗しました");
 
         status.textContent = "送信が完了しました！";
         document.getElementById("message").value = "";
+        status.style.color = "green";
       } catch (err) {
         status.textContent = "エラーが発生しました：" + err.message;
         status.style.color = "red";
