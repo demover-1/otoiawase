@@ -71,7 +71,7 @@
     // Make.com の Webhook URL
     const webhookUrl = "https://hook.eu2.make.com/qqgf8srez9urb5j6cmx1qxn41v1st7tg";
 
-    // userIdをURLから取得
+    // URLのパラメータ取得（userIdなど）
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('userId');
 
@@ -90,15 +90,15 @@
       }
 
       try {
-        // GETパラメータにエンコードして送信
-        const query = new URLSearchParams({
+        // URLにパラメータをつけてGET送信
+        const queryParams = new URLSearchParams({
           userId: userId,
           inquiry: messageText
         });
 
-        const res = await fetch(`${webhookUrl}?${query.toString()}`, {
-          method: "GET"
-        });
+        const fullUrl = `${webhookUrl}?${queryParams.toString()}`;
+
+        const res = await fetch(fullUrl, { method: "GET" });
 
         if (!res.ok) throw new Error("送信に失敗しました");
 
