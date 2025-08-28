@@ -40,7 +40,11 @@
     font-size: 16px;
     cursor: pointer;
   }
-  button:hover { background-color: #0353e9; }
+  button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  button:hover:not(:disabled) { background-color: #0353e9; }
   .message {
     margin-top: 20px;
     font-weight: bold;
@@ -79,7 +83,7 @@
 <script>
 const webhookUrl = "https://hook.eu2.make.com/8anawrwfconzdpic5voda2vcjg2ayjhi";
 
-// URLのパラメータ取得（userIdなど）
+// URLパラメータ取得
 const urlParams = new URLSearchParams(window.location.search);
 const userId = urlParams.get('userId');
 
@@ -106,6 +110,10 @@ submitBtn.addEventListener("click", async () => {
     inquiry: messageText
   };
 
+  // 連打防止
+  submitBtn.disabled = true;
+  submitBtn.textContent = "送信中...";
+
   try {
     await fetch(webhookUrl, {
       method: "POST",
@@ -113,13 +121,17 @@ submitBtn.addEventListener("click", async () => {
       body: JSON.stringify(data)
     });
 
-    // 成功したら完了画面へ
+    // 成功 → 完了画面表示
     formPage.style.display = "none";
     completionPage.style.height = window.innerHeight + "px";
     completionPage.style.display = "flex";
   } catch(err) {
     statusMessage.textContent = "送信に失敗しました：" + err.message;
     statusMessage.style.color = "red";
+
+    // 失敗時にボタンを元に戻す
+    submitBtn.disabled = false;
+    submitBtn.textContent = "送信";
   }
 });
 </script>
